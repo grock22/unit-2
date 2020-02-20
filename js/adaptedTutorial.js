@@ -1,4 +1,4 @@
-//griffin rock 2/12/20//
+/* Map of GeoJSON data from MegaCities.geojson */
 //declare map var in global scope
 var map;
 
@@ -22,7 +22,7 @@ function createMap(){
 //function to retrieve the data and place it on the map
 function getData(){
     //load the data
-    $.getJSON("data/alaska_dec_snowfalls.geojson", function(response){
+    $.getJSON("data/MegaCities.geojson", function(response){
             //create marker options
 			var geojsonMarkerOptions = {
                 radius: 8,
@@ -37,14 +37,14 @@ function getData(){
             L.geoJson(response, {
                 pointToLayer: function (feature, latlng){
                     return L.circleMarker(latlng, geojsonMarkerOptions);
+				onEachFeature: onEachFeature
                 }
             }).addTo(map)
             L.geoJson(response, {
-				onEachFeature: onEachFeature				
+				onEachFeature: onEachFeature
 			}).addTo(map);
         });
 };
-
 function onEachFeature(feature, layer) {
     //no property named popupContent; instead, create html string with all properties
     var popupContent = "";
