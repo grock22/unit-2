@@ -3,13 +3,34 @@
 	display: inline-block;
 }
 #panel {
-    width: 18%;
+    width: 22%;
     padding: 20px;
     display: inline-block;
     vertical-align: top;
     text-align: center;
     line-height: 42px;
-}	
+}
+
+.range-slider {
+    width: 58%;
+}
+
+.step {
+	width: 18%;
+}
+
+.step img {
+	width: 100%;
+}
+
+
+#forward {
+    float: right;
+}
+
+#reverse {
+    float: left;
+}
 
 .leaflet-popup-content p {
     margin: 1.0em 0;

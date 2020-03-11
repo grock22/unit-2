@@ -52,9 +52,15 @@ function calcPropRadius(attValue) {
      return radius;
 };
 
+function pointToLayer(feature, latlng, attributes){
+    //Step 4: Assign the current attribute based on the first index of the attributes array
+    var attribute = attributes[0];
+    //check
+    console.log(attribute);
+
 //function to retrieve the data and place it on the map
 //Step 3: Add circle markers for point features to the map
-function createPropSymbols(data){
+function createPropSymbols(data, attributes){
     var attribute = "Dec_31";
 		
 	//create marker options
@@ -99,11 +105,13 @@ function createPropSymbols(data){
             geojsonMarkerOptions.radius = calcPropRadius(attValue);
 			
 			return L.circleMarker(latlng, geojsonMarkerOptions);
+			
+			return pointToLayer(featire, latlng, attributes);
         }
     }).addTo(map);
 };
 
-//Step 1: Create new sequence controls
+//new sequence controls
 function createSequenceControls(){
     //create range input element (slider)
     $('#panel').append('<input class="range-slider" type="range">');
@@ -115,36 +123,49 @@ function createSequenceControls(){
         value: 0,
         step: 1
 	});
+	
 	$('#panel').append('<button class="step" id="reverse">Reverse</button>');
     $('#panel').append('<button class="step" id="forward">Forward</button>');
+	$('#reverse').html('<img src="img/reverse.png">');
+	$('#forward').html('<img src="img/fast_f.png">');
 };
 
-//Import GeoJSON data
-// function getData(map){
-    // //load the data
-    // $.ajax("data/alaska_dec_snowfalls.geojson", {
-        // dataType: "json",
-        // success: function(response){
-            // minValue = calcMinValue(response);
-            // //add symbols and UI elements
-            // createPropSymbols(response);
-            // createSequenceControls();
 
-        // }
-    // });
-// };
+//build atributes array from the data
+function processData(data){
+    //empty array to hold attributes
+    var attributes = [];
 
+    //properties of the first feature in the dataset
+    var properties = data.features[0].properties;
+
+    //push each attribute name into attributes array
+    for (var attribute in properties){
+        //only take attributes with population values
+        if (attribute.indexOf("Dec") > -1){
+            attributes.push(attribute);
+        };
+    };
+
+    //check result
+    //console.log(attributes);
+
+    return attributes;
+};
 //Step 2: Import GeoJSON data
 function getData(map){
     //load the data
     $.ajax("data/alaska_dec_snowfalls.geojson", {
 		dataType: "json",
 		success: function(response){
-        //calculate minimum data value
-        minValue = calcMinValue(response);			
-		//call function to create proportional symbols
-        createPropSymbols(response);
-		createSequenceControls();
+			//creates attributes array
+			var attributes = processData(response);
+			
+			//calculate minimum data value
+			minValue = calcMinValue(response);			
+			//call function to create proportional symbols
+			createPropSymbols(response, attributes);
+			createSequenceControls(attributes);
 		}
 	});
 };
