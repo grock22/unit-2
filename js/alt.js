@@ -18,38 +18,52 @@ function createMap(){
     //call getData function
     getData();
 };
-function calcMinValue(data){
-     
-     //create empty array to store all data values
-     var allValues = [];
-     
-     //loop through each city
-     for(var Station_Name of data.features){
-          //loop through each day
-          for(var day = 1; day <= 31; day+=1){
-                //get snowfall for current day
-               var value = Station_Name.properties["Dec_"+ String(day)];
-			   //add value to array
-               allValues.push(value);
-           }
-     }
-     
-     //get minimum value of our array
-     var minValue = Math.min(...allValues)
+//Step 2: Import GeoJSON data
+function getData(map){
+    //load the data
+    $.ajax("data/alaska_dec_snowfalls.geojson", {
+		dataType: "json",
+		success: function(response){
+			//creates attributes array
+			var attributes = processData(response);
+			
+			//calculate minimum data value
+			minValue = calcMinValue(response);			
+			//call function to create proportional symbols
+			createPropSymbols(response, attributes);
+			createSequenceControls(attributes);
+		}
+	});
+};
+//build atributes array from the data
+function processData(data){
+    //empty array to hold attributes
+    var attributes = [];
 
-     return minValue;
-}
+    //properties of the first feature in the dataset
+    var properties = data.features[0].properties;
 
-//calculate the radius of each proportional symbol
-function calcPropRadius(attValue) {
-     
-     //constant factor adjusts symbol sizes evenly
-     var minRadius = 3;
-     
-     //Flannery Appearance Compensation formula
-     var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
+    //push each attribute name into attributes array
+    for (var attribute in properties){
+        //only take attributes with population values
+        if (attribute.indexOf("Dec") > -1){
+            attributes.push(attribute);
+        };
+    };
 
-     return radius;
+    return attributes;
+};
+
+//Step 3: Add circle markers for point features to the map
+function createPropSymbols(data, attributes){	
+	//create a Leaflet GeoJSON layer and add it to the map
+    L.geoJson(data, {
+        pointToLayer: function (feature, latlng) {
+			return pointToLayer(feature, latlng, attributes);
+			
+        }
+		
+    }).addTo(map);
 };
 
 function pointToLayer(feature, latlng, attributes){
@@ -97,17 +111,42 @@ function pointToLayer(feature, latlng, attributes){
 }
 
 //function to retrieve the data and place it on the map
-//Step 3: Add circle markers for point features to the map
-function createPropSymbols(data, attributes){	
-	//create a Leaflet GeoJSON layer and add it to the map
-    L.geoJson(data, {
-        pointToLayer: function (feature, latlng) {
-			return pointToLayer(feature, latlng, attributes);
-			
-        }
-		
-    }).addTo(map);
+
+
+function calcMinValue(data){
+     
+     //create empty array to store all data values
+     var allValues = [];
+     
+     //loop through each city
+     for(var Station_Name of data.features){
+          //loop through each day
+          for(var day = 1; day <= 31; day+=1){
+                //get snowfall for current day
+               var value = Station_Name.properties["Dec_"+ String(day)];
+			   //add value to array
+               allValues.push(value);
+           }
+     }
+     
+     //get minimum value of our array
+     var minValue = Math.min(...allValues)
+
+     return minValue;
+}
+
+//calculate the radius of each proportional symbol
+function calcPropRadius(attValue) {
+     
+     //constant factor adjusts symbol sizes evenly
+     var minRadius = 3;
+     
+     //Flannery Appearance Compensation formula
+     var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
+
+     return radius;
 };
+
 
 //new sequence controls
 function createSequenceControls(attributes){
@@ -186,39 +225,6 @@ function updatePropSymbols(attribute){
     });
 };
 
-//build atributes array from the data
-function processData(data){
-    //empty array to hold attributes
-    var attributes = [];
 
-    //properties of the first feature in the dataset
-    var properties = data.features[0].properties;
 
-    //push each attribute name into attributes array
-    for (var attribute in properties){
-        //only take attributes with population values
-        if (attribute.indexOf("Dec") > -1){
-            attributes.push(attribute);
-        };
-    };
-
-    return attributes;
-};
-//Step 2: Import GeoJSON data
-function getData(map){
-    //load the data
-    $.ajax("data/alaska_dec_snowfalls.geojson", {
-		dataType: "json",
-		success: function(response){
-			//creates attributes array
-			var attributes = processData(response);
-			
-			//calculate minimum data value
-			minValue = calcMinValue(response);			
-			//call function to create proportional symbols
-			createPropSymbols(response, attributes);
-			createSequenceControls(attributes);
-		}
-	});
-};
 $(document).ready(createMap);
