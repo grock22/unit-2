@@ -102,13 +102,15 @@ function createPropSymbols(data, attributes){
 	//create a Leaflet GeoJSON layer and add it to the map
     L.geoJson(data, {
         pointToLayer: function (feature, latlng) {
-        	return pointToLayer(feature, latlng, attributes);
+			return pointToLayer(feature, latlng, attributes);
+			
         }
+		
     }).addTo(map);
 };
 
 //new sequence controls
-function createSequenceControls(){
+function createSequenceControls(attributes){
     //create range input element (slider)
     $('#panel').append('<input class="range-slider" type="range">');
 	
@@ -119,11 +121,16 @@ function createSequenceControls(){
         value: 0,
         step: 1
 	});
+	$('#panel').append('<button class="step" id="reverse">Reverse</button>');
+    $('#panel').append('<button class="step" id="forward">Forward</button>');
+	$('#reverse').html('<img src="img/reverse.png">');
+	$('#forward').html('<img src="img/fast_f.png">');
 	
 	//Step 5: click listener for buttons
     $('.step').click(function(){
         //get the old index value
         var index = $('.range-slider').val();
+		
 		
         //Step 6: increment or decrement depending on button clicked
         if ($(this).attr('id') == 'forward'){
@@ -137,7 +144,6 @@ function createSequenceControls(){
 		};	
 		//Step 8: update slider
 		$('.range-slider').val(index);
-		
 		//step 9
 		updatePropSymbols(attributes[index]);
         
@@ -147,22 +153,17 @@ function createSequenceControls(){
     $('.range-slider').on('input', function(){
         //Step 6: get the new index value
         var index = $(this).val();
-        console.log(index);
+		
 		//step 9
-		//console.log(attributes[1])
+		
 		updatePropSymbols(attributes[index]);
 		
-    });
-	
-	$('#panel').append('<button class="step" id="reverse">Reverse</button>');
-    $('#panel').append('<button class="step" id="forward">Forward</button>');
-	$('#reverse').html('<img src="img/reverse.png">');
-	$('#forward').html('<img src="img/fast_f.png">');
+    });	
 };
 
 //Step 10: Resize proportional symbols according to new attribute values
 function updatePropSymbols(attribute){
-    map.eachLayer(function(layer){
+	map.eachLayer(function(layer){
         if (layer.feature && layer.feature.properties[attribute]){
             //access feature properties
             var props = layer.feature.properties;
@@ -176,7 +177,7 @@ function updatePropSymbols(attribute){
 
             //add formatted attribute to panel content string
             var day = attribute.split("_")[1];
-            popupContent += "<p><b>Total Snowfall on December" + day + ": </b> " + props[attribute] + " inches</p>";
+            popupContent += "<p><b>Total Snowfall on December " + day + ": </b> " + props[attribute] + " inches</p>";
 
             //update popup content
             popup = layer.getPopup();
@@ -200,9 +201,6 @@ function processData(data){
             attributes.push(attribute);
         };
     };
-
-    //check result
-    //console.log(attributes);
 
     return attributes;
 };
