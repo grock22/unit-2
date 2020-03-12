@@ -245,7 +245,7 @@ function createLegend(attributes){
 
 
 			//Step 1: start attribute legend svg string
-            var svg = '<svg id="attribute-legend" width="160px" height="100px">';
+            var svg = '<svg id="attribute-legend" width="270px" height="240px">';
 			//array of circle names to base loop on
 			var circles = ["max", "mean", "min"];
 
@@ -254,15 +254,15 @@ function createLegend(attributes){
 
 				//Step 3: assign the r and cy attributes
                 var radius = calcPropRadius(dataStats[circles[i]]);
-                var cy = 100 - radius;
+                var cy = 230 - radius;
 				 //circle string
-                svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + radius + '"cy="' + cy + '" fill="#ab1200" fill-opacity="0.8" stroke="#abf" cx="62"/>';
+                svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + radius + '"cy="' + cy + '" fill="#ab1200" fill-opacity="0.8" stroke="#abf" cx="64"/>';
 
                 //evenly space out labels
-                var textY = i * 20 + 20;
+                var textY = i * 25 + 180;
 
                 //text string
-                svg += '<text id="' + circles[i] + '-text" x="65" y="' + textY + '">' + Math.round(dataStats[circles[i]]*100)/100 + " inches" + '</text>';
+                svg += '<text id="' + circles[i] + '-text" x="150" y="' + textY + '">' + Math.round(dataStats[circles[i]]*100)/100 + " inches" + '</text>';
 			};
 
 			//close svg string
