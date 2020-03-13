@@ -32,7 +32,7 @@ function getData(map){
 			//call function to create proportional symbols
 			createPropSymbols(response, attributes);
 			createSequenceControls(attributes);
-			createLegend();
+			createLegend(attributes);
 		}
 	});
 };
@@ -100,8 +100,6 @@ function pointToLayer(feature, latlng, attributes){
 
 	//return the circle marker to the L.geoJson pointToLayer option
 	return layer;
-
-	//return L.circleMarker(latlng, geojsonMarkerOptions);
 }
 
 //creates popups which can be accessed by pointToLayer and updatePropSymbols
@@ -238,12 +236,20 @@ function createLegend(attributes){
         onAdd: function () {
             // create the control container with a particular class name
             var container = L.DomUtil.create('div', 'legend-control-container');
-            $(container).append('<div id="tempor_legend" "<p><b>Total Snowfall on December "' + 1 + '":</b></p>' );
-			//container.innerHTML += "<p><b>Total Snowfall on December " + day + ":</b></p>"  // don't forget the break tag
-			//"<p><b>Total Snowfall on December " + day + ":</b> " + properties[attribute] + " inches</p>";
-			//$(container).append('<button class="step" id="reverse" title="Reverse">Reverse</button>');
-
-
+            			
+			var attribute = attributes[0]
+			var day = updateTempLegend(attribute)
+			
+			console.log(day)
+			
+			
+			$(container).append('<div id="TempLegend">Total Snowfall on December 1</div>');
+			
+			
+			// could not figure out temporal legend, how to get variable in there as text
+			//$(container).append('<div id="TempLegend"> day </div>');
+			//TempLegend.innerHTML += "<p><b>day</b></p>"
+			
 			//Step 1: start attribute legend svg string
             var svg = '<svg id="attribute-legend" width="270px" height="240px">';
 			//array of circle names to base loop on
@@ -254,12 +260,12 @@ function createLegend(attributes){
 
 				//Step 3: assign the r and cy attributes
                 var radius = calcPropRadius(dataStats[circles[i]]);
-                var cy = 230 - radius;
+                var cy = 135 - radius;
 				 //circle string
                 svg += '<circle class="legend-circle" id="' + circles[i] + '" r="' + radius + '"cy="' + cy + '" fill="#ab1200" fill-opacity="0.8" stroke="#abf" cx="64"/>';
 
                 //evenly space out labels
-                var textY = i * 25 + 180;
+                var textY = i * 27 + 79;
 
                 //text string
                 svg += '<text id="' + circles[i] + '-text" x="150" y="' + textY + '">' + Math.round(dataStats[circles[i]]*100)/100 + " inches" + '</text>';
@@ -277,9 +283,17 @@ function createLegend(attributes){
 
     map.addControl(new LegendControl());
 
-	//updateLegend(map, attributes[0]);
+	//updateTempLegend(map, attributes[0]);
 };
-
+//update the temporal legend
+function updateTempLegend(attribute) {
+	// split attributes to get day number
+	var day = attribute.split("_")[1];
+	//total string
+	var day_of = "<p><b>Total Snowfall on December " + day + "</b> ";
+	return day_of
+};
+	
 //Step 10: Resize proportional symbols according to new attribute values
 function updatePropSymbols(attribute){
 	map.eachLayer(function(layer){

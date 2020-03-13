@@ -225,6 +225,4 @@ function updatePropSymbols(attribute){
     });
 };
 
-
-
 $(document).ready(createMap);
